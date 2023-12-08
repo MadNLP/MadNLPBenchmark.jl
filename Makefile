@@ -11,3 +11,6 @@ bench_examodels:
 
 bench_powermodels: 
 	$(JULIAEXEC) --project=powermodels powermodels/benchmark.jl
+
+bench_argos_bieglerkkt:
+	$(JULIAEXEC) --project=argos argos/full/benchmark.jl
