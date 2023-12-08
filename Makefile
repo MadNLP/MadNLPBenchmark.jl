@@ -1,6 +1,8 @@
 
 JULIAEXEC=julia
 
+all: bench_cutest bench_examodels bench_powermodels
+
 bench_cutest:
 	$(JULIAEXEC) --project=cutest cutest/benchmark.jl
 

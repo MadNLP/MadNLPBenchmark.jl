@@ -4,11 +4,15 @@ using Distributed
 # Load CUTEst library
 @everywhere include("config.jl")
 
-RESULTS_DIR = joinpath(@__DIR__, "results")
+BASE_DIR = joinpath(@__DIR__, "..", "results")
+RESULTS_DIR = joinpath(BASE_DIR, "cutest")
 QUICK_BENCHMARK = true
 DECODE = true
 SOLVER = "madnlp"
 
+if !isdir(BASE_DIR)
+    mkdir(BASE_DIR)
+end
 if !isdir(RESULTS_DIR)
     mkdir(RESULTS_DIR)
 end

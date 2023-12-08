@@ -11,9 +11,13 @@ CUDA.allowscalar(false);
 include("model.jl")
 include("config.jl")
 
-RESULTS_DIR = joinpath(@__DIR__, "results")
+BASE_DIR = joinpath(@__DIR__, "..", "results")
+RESULTS_DIR = joinpath(BASE_DIR, "exaopf")
 SOLVER = "madnlp-cpu"
 
+if !isdir(BASE_DIR)
+    mkdir(BASE_DIR)
+end
 if !isdir(RESULTS_DIR)
     mkdir(RESULTS_DIR)
 end
