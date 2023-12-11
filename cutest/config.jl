@@ -35,16 +35,6 @@ end
     MadNLP
 =#
 
-function madnlp_solver(nlp)
-    return madnlp(
-        nlp;
-        linear_solver=Ma57Solver,
-        max_wall_time=900.0,
-        print_level=MadNLP.ERROR,
-        tol=1e-6,
-    )
-end
-
 function get_status(code::MadNLP.Status)
     if code == MadNLP.SOLVE_SUCCEEDED
         return 1
@@ -60,16 +50,6 @@ end
     Ipopt
 =#
 
-function ipopt_solver(nlp)
-    return ipopt(
-        nlp;
-        linear_solver="ma57",
-        max_cpu_time=900.0,
-        print_level=0,
-        tol=1e-6,
-    )
-end
-
 function get_status(code::Symbol)
     if code == :first_order
         return 1
@@ -80,3 +60,24 @@ function get_status(code::Symbol)
     end
 end
 
+#=
+    main
+=#
+
+function benchmark(solver, probs; warm_up_probs=[], decode=false, gc_off=true)
+    println("Warming up (forcing JIT compile)")
+    decode && broadcast(decodemodel,warm_up_probs)
+    r = [remotecall.(prob->evalmodel(prob,solver;gcoff=gc_off),i,warm_up_probs) for i in procs() if i!= 1]
+    fetch.(r)
+
+    println("Decoding problems")
+    decode && broadcast(decodemodel,probs)
+
+    println("Solving problems")
+    retvals = pmap(prob->evalmodel(prob,solver;gcoff=gc_off),probs)
+    status = [retval.status for retval in retvals]
+    time   = [retval.time for retval in retvals]
+    mem    = [retval.mem for retval in retvals]
+    iter   = [retval.iter for retval in retvals]
+    return status, time, mem, iter
+end
