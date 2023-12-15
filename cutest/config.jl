@@ -6,6 +6,28 @@ using NLPModelsIpopt
 using MadNLP
 using MadNLPHSL
 
+EXCLUDE = [
+    # MadNLP running into error
+    # Ipopt running into error
+    "EG3", # lfact blows up
+    # Problems that are hopelessly large
+    "TAX213322",
+    "TAXR213322",
+    "TAX53322",
+    "TAXR53322",
+    "YATP1LS",
+    "YATP2LS",
+    "YATP1CLS",
+    "YATP2CLS",
+    "CYCLOOCT",
+    "CYCLOOCF",
+    "LIPPERT1",
+    "GAUSSELM",
+    "BA-L52LS",
+    "BA-L73LS",
+    "BA-L21LS",
+]
+
 function decodemodel(name)
     println("Decoding $name")
     finalize(CUTEstModel(name))
@@ -35,6 +57,16 @@ end
     MadNLP
 =#
 
+function madnlp_solver(nlp)
+    return madnlp(
+        nlp;
+        linear_solver=Ma57Solver,
+        max_wall_time=900.0,
+        print_level=MadNLP.ERROR,
+        tol=1e-6,
+    )
+end
+
 function get_status(code::MadNLP.Status)
     if code == MadNLP.SOLVE_SUCCEEDED
         return 1
@@ -58,6 +90,16 @@ function get_status(code::Symbol)
     else
         return 3
     end
+end
+
+function ipopt_solver(nlp)
+    return ipopt(
+        nlp;
+        linear_solver="ma57",
+        max_cpu_time=900.0,
+        print_level=0,
+        tol=1e-6,
+    )
 end
 
 #=

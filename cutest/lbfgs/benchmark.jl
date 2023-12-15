@@ -1,4 +1,5 @@
 
+using Comonicon
 using Distributed
 
 # Load CUTEst library
@@ -6,15 +7,8 @@ using Distributed
 
 BASE_DIR = joinpath(@__DIR__, "..", "..", "results")
 RESULTS_DIR = joinpath(BASE_DIR, "cutest", "lbfgs")
-QUICK_BENCHMARK = true
-DECODE = true
-SOLVER = "madnlp"
 
-if !isdir(RESULTS_DIR)
-    mkpath(RESULTS_DIR)
-end
-
-function madnlp_solver_lbfgs(nlp)
+@everywhere function madnlp_solver_lbfgs(nlp)
     return madnlp(
         nlp;
         callback = MadNLP.SparseCallback,
@@ -27,7 +21,7 @@ function madnlp_solver_lbfgs(nlp)
     )
 end
 
-function ipopt_solver_lbfgs(nlp)
+@everywhere function ipopt_solver_lbfgs(nlp)
     return ipopt(
         nlp;
         linear_solver="ma57",
@@ -39,33 +33,37 @@ function ipopt_solver_lbfgs(nlp)
     )
 end
 
-exclude = [
-    # MadNLP running into error
-    # Ipopt running into error
-    "EG3", # lfact blows up
-    # Problems that are hopelessly large
-    "TAX213322","TAXR213322","TAX53322","TAXR53322",
-    "YATP1LS","YATP2LS","YATP1CLS","YATP2CLS",
-    "CYCLOOCT","CYCLOOCF",
-    "LIPPERT1",
-    "GAUSSELM",
-    "BA-L52LS","BA-L73LS","BA-L21LS"
-]
+@main function main(; solver="madnlp", decode=true, quick::Bool=false)
+    if !isdir(RESULTS_DIR)
+        mkpath(RESULTS_DIR)
+    end
 
-probs = readdlm(joinpath(@__DIR__, "cutest-lbfgs-names.csv"))[:]
+    probs = if quick
+        probs = readdlm(joinpath(@__DIR__, "cutest-lbfgs-names.csv"))[:]
+    else
+        probs = CUTEst.select()
+    end
+    flag = quick ? "quick" : "complete"
 
-filter!(e->!(e in exclude),probs)
+    filter!(e->!(e in EXCLUDE),probs)
 
-solver = if SOLVER == "madnlp"
-    madnlp_solver_lbfgs
-elseif SOLVER == "ipopt"
-    ipopt_solver_lbfgs
+    run_madnlp = (solver == "madnlp") || (solver == "all")
+    run_ipopt = (solver == "ipopt") || (solver == "all")
+
+    if run_madnlp
+        @info "Benchmark MadNLP-LBFGS"
+        status,time,mem,iter = benchmark(madnlp_solver_lbfgs,probs;warm_up_probs = ["EIGMINA"], decode = decode)
+        results = [probs status time mem iter]
+        output_file = joinpath(RESULTS_DIR, "cutest-$(flag)-madnlp-lbfgs.csv")
+        writedlm(output_file, results)
+    end
+    if run_ipopt
+        @info "Benchmark Ipopt-LBFGS"
+        status,time,mem,iter = benchmark(ipopt_solver_lbfgs,probs;warm_up_probs = ["EIGMINA"], decode = decode)
+        results = [probs status time mem iter]
+        output_file = joinpath(RESULTS_DIR, "cutest-$(flag)-ipopt-lbfgs.csv")
+        writedlm(output_file, results)
+    end
 end
 
-status,time,mem,iter = benchmark(solver,probs;warm_up_probs = ["EIGMINA"], decode = DECODE)
-
-results = [probs status time mem iter]
-flag = "short"
-output_file = joinpath(RESULTS_DIR, "cutest-$(flag)-$(SOLVER).csv")
-writedlm(output_file, results)
 

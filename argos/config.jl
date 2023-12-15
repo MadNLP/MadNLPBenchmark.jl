@@ -49,7 +49,7 @@ function refresh_memory()
     return
 end
 
-function build_opf(model, kkt::Union{Argos.FullSpace, Argos.BieglerKKTSystem}; use_gpu=false)
+function build_opf(model, kkt::Union{Argos.FullSpace, Argos.BieglerReduction}; use_gpu=false)
     blk = if use_gpu
         model_gpu = PolarForm(model, CUDABackend())
         flp = Argos.FullSpaceEvaluator(model_gpu)

@@ -278,8 +278,8 @@ function jump_ac_power_model(filename)
         va_fr = va[branch["f_bus"]]
         va_to = va[branch["t_bus"]]
 
-        g, b = ExaModelsExamples.PowerModels.calc_branch_y(branch)
-        tr, ti = ExaModelsExamples.PowerModels.calc_branch_t(branch)
+        g, b = PowerModels.calc_branch_y(branch)
+        tr, ti = PowerModels.calc_branch_t(branch)
         ttm = tr^2 + ti^2
         g_fr = branch["g_fr"]
         b_fr = branch["b_fr"]
