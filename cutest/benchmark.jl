@@ -8,7 +8,8 @@ using Distributed
 BASE_DIR = joinpath(@__DIR__, "..", "results")
 RESULTS_DIR = joinpath(BASE_DIR, "cutest")
 
-@main function main(; solver="madnlp", decode::Bool=true, quick::Bool=false)
+@main function main(; solver="madnlp", decode::Int=1, quick::Bool=false)
+    decode = Bool(decode)
     if !isdir(RESULTS_DIR)
         mkpath(RESULTS_DIR)
     end

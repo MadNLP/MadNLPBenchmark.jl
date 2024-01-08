@@ -3,6 +3,7 @@ using DelimitedFiles
 using CUTEst
 using NLPModelsIpopt
 
+using HSL
 using MadNLP
 using MadNLPHSL
 
@@ -95,6 +96,7 @@ end
 function ipopt_solver(nlp)
     return ipopt(
         nlp;
+        hsllib=HSL.HSL_jll.libhsl_path,
         linear_solver="ma57",
         max_cpu_time=900.0,
         print_level=0,

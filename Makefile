@@ -1,23 +1,18 @@
 
 JULIAEXEC=julia
+NPROCS=1
 
-all: bench_cutest bench_examodels bench_powermodels
+install:
+	$(JULIAEXEC) --project=cutest -e "using Pkg; Pkg.instantiate()"
+	$(JULIAEXEC) --project=powermodels -e "using Pkg; Pkg.instantiate()"
+	$(JULIAEXEC) --project=exaopf -e "using Pkg; Pkg.instantiate()"
+	$(JULIAEXEC) --project=argos -e "using Pkg; Pkg.instantiate()"
 
-bench_cutest:
-	$(JULIAEXEC) --project=cutest cutest/benchmark.jl
-
-bench_cutest_lbfgs:
-	$(JULIAEXEC) --project=cutest cutest/lbfgs/benchmark.jl
-
-bench_examodels: 
-	$(JULIAEXEC) --project=exaopf exaopf/benchmark.jl
-
-bench_powermodels: 
-	$(JULIAEXEC) --project=powermodels powermodels/benchmark.jl
-
-bench_argos_bieglerkkt:
+all: 
+	$(JULIAEXEC) --project=cutest -p $(NPROCS) cutest/benchmark.jl --solver all 
+	$(JULIAEXEC) --project=cutest -p $(NPROCS) cutest/lbfgs/benchmark.jl --solver all 
+	$(JULIAEXEC) --project=powermodels -p $(NPROCS) powermodels/benchmark.jl --solver all 
+	$(JULIAEXEC) --project=exaopf exaopf/benchmark.jl --solver all 
 	$(JULIAEXEC) --project=argos argos/full/benchmark.jl
-
-bench_argos_reduced:
 	$(JULIAEXEC) --project=argos argos/reduced/benchmark.jl
 
