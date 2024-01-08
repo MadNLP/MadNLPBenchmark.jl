@@ -1,4 +1,23 @@
-PGLIB_PATH  = ENV["PGLIB_PATH"]
+
+using DelimitedFiles
+using MadNLP, MadNLPHSL, MadNLPGPU
+using JuMP, Ipopt, CUDA, NLPModels
+using PowerModels
+using Printf
+using LinearAlgebra
+
+include("model.jl")
+
+if haskey(ENV, "PGLIB_PATH")
+    const PGLIB_PATH = ENV["PGLIB_PATH"]
+else
+    error("Unable to find path to PGLIB benchmark.\n"*
+        "Please set environment variable `PGLIB_PATH` to run benchmark with PowerModels.jl")
+end
+
+CUDA.allowscalar(false);
+PowerModels.silence()
+
 pglib_cases = map(
     v -> (
         split(split(v, "case")[2], ".")[1],

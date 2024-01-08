@@ -1,16 +1,6 @@
 
 using Comonicon
-using DelimitedFiles
-using MadNLP, MadNLPHSL, MadNLPGPU
-using JuMP, Ipopt, CUDA, NLPModels
-using PowerModels
-using Printf
-using LinearAlgebra
 
-PowerModels.silence()
-CUDA.allowscalar(false);
-
-include("model.jl")
 include("config.jl")
 
 BASE_DIR = joinpath(@__DIR__, "..", "results")
