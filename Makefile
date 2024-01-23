@@ -1,18 +1,25 @@
 
 JULIAEXEC=julia
 NPROCS=1
+BENCHMARKS= cutest powermodels exaopf argos
 
 install:
-	$(JULIAEXEC) --project=cutest -e "using Pkg; Pkg.instantiate()"
-	$(JULIAEXEC) --project=powermodels -e "using Pkg; Pkg.instantiate()"
-	$(JULIAEXEC) --project=exaopf -e "using Pkg; Pkg.instantiate()"
-	$(JULIAEXEC) --project=argos -e "using Pkg; Pkg.instantiate()"
+	for benchmark in $(BENCHMARKS) ; do \
+		echo Install $${benchmark} ; \
+		$(JULIAEXEC) --project=$${benchmark} -e "using Pkg; Pkg.instantiate()" ; \
+	done
+
+update:
+	for benchmark in $(BENCHMARKS) ; do \
+		echo Update benchmark $${benchmark} ; \
+		$(JULIAEXEC) --project=$${benchmark} -e "using Pkg; Pkg.update()" ; \
+	done
 
 test: 
-	$(JULIAEXEC) --project=cutest cutest/test.jl
-	$(JULIAEXEC) --project=powermodels powermodels/test.jl
-	$(JULIAEXEC) --project=exaopf exaopf/test.jl
-	$(JULIAEXEC) --project=argos argos/test.jl
+	for benchmark in $(BENCHMARKS) ; do \
+		echo $${benchmark} ; \
+		$(JULIAEXEC) --project=$${benchmark} $${benchmark}/test.jl ; \
+	done
 
 all: 
 	$(JULIAEXEC) --project=cutest -p $(NPROCS) cutest/benchmark.jl --solver all 
