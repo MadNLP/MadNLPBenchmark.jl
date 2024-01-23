@@ -116,5 +116,21 @@ julia --project=argos argos/reduced/benchmark.jl
 
 ## Plots
 The directory `plots/` stores various scripts to plot the results of the different benchmark,
-including performance profiles.
+including performance profiles. The performance profiles are plotted
+using the [BenchmarkProfiles.jl](https://github.com/JuliaSmoothOptimizers/BenchmarkProfiles.jl) package, kindly provided by JuliaSmoothOptimizers.
+
+The directory has two scripts:
+1. `plots/plot_profile.jl` shows the result of the benchmark as a performance profile.
+    ```shell
+    julia --project=plots plots/plot_profile.jl results/cutest/cutest-quick-{ipopt,madnlp}.csv --type "iter"
+
+    ```
+1. `plots/scan.jl` scans the benchmark and return a text file showing the detailed results.
+    ```shell
+    julia --project=plots plots/scan.jl results/cutest/cutest-quick-{ipopt,madnlp}.csv --type "iter"
+
+    ```
+    The script writes two files in the directory `results/scan`: `results/scan/benchmark.txt` shows all the benchmark, whereas
+    `results/scan/failures.txt` shows only the instance when the first solver is successful and the
+    second solver failed.
 
