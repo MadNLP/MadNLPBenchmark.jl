@@ -22,18 +22,22 @@ RESULTS_DIR = joinpath(BASE_DIR, "argos", "reduced")
     end
 
     use_gpu = IS_GPU_AVAILABLE
+    flag = quick ? "quick" : "full"
+    dev = use_gpu ? "cuda" : "cpu"
     lapack_solver = use_gpu ? LapackGPUSolver : LapackCPUSolver
 
-    main(
+    results = main(
         cases,
         Argos.DommelTinney(),
         ntrials;
-        print_level=MadNLP.INFO,
+        print_level=MadNLP.ERROR,
         linear_solver=lapack_solver,
         use_gpu=use_gpu,
         max_iter=300,
         tol=1e-5,
         dual_initialized=true,
     )
+    output_file = joinpath(RESULTS_DIR, "argos-$(flag)-reduced-$(dev).txt")
+    writedlm(output_file, [cases results])
 end
 

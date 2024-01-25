@@ -1,6 +1,7 @@
 using DelimitedFiles
 
 using CUDA
+using CUSOLVERRF
 
 using NLPModels
 
@@ -10,7 +11,6 @@ using MadNLPGPU
 
 using ExaPF
 using Argos
-using ArgosCUDA
 
 const PS = ExaPF.PowerSystem
 
@@ -152,16 +152,6 @@ function benchmark(model, kkt; use_gpu=false, ntrials=3, options...)
 end
 
 function main(cases, kkt, ntrials; use_gpu=false, options...)
-    # Setup
-    dev = use_gpu ? :cuda : :cpu
-    form = if isa(kkt, Argos.BieglerReduction)
-        :bieglerkkt
-    elseif isa(kkt, Argos.DommelTinney)
-        :reduced
-    elseif isa(kkt, Argos.FullSpace)
-        :sparsekkt
-    end
-
     nexp = length(cases)
     results = zeros(nexp, 6)
 
@@ -174,8 +164,6 @@ function main(cases, kkt, ntrials; use_gpu=false, options...)
         results[i, :] .= (r.status, r.iters, r.obj, r.total, r.callbacks, r.linear_solver)
     end
 
-    output_file = joinpath(RESULTS_DIR, "argos-$(form)-$(dev).txt")
-    writedlm(output_file, [cases results])
     return results
 end
 

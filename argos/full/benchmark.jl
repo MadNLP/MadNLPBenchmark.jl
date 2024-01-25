@@ -23,9 +23,13 @@ RESULTS_DIR = joinpath(BASE_DIR, "argos", "full")
     end
 
     use_gpu = IS_GPU_AVAILABLE
+
+    flag = quick ? "quick" : "full"
+    dev = use_gpu ? "cuda" : "cpu"
+
     lapack_solver = use_gpu ? LapackGPUSolver : LapackCPUSolver
 
-    main(
+    results = main(
         cases,
         Argos.FullSpace(),
         ntrials;
@@ -36,6 +40,9 @@ RESULTS_DIR = joinpath(BASE_DIR, "argos", "full")
         tol=1e-5,
         dual_initialized=true,
     )
+
+    output_file = joinpath(RESULTS_DIR, "argos-$(flag)-sparsekkt-$(dev).txt")
+    writedlm(output_file, [cases results])
 
     if IS_GPU_AVAILABLE
         main(
@@ -49,5 +56,7 @@ RESULTS_DIR = joinpath(BASE_DIR, "argos", "full")
             tol=1e-5,
             dual_initialized=true,
         )
+        output_file = joinpath(RESULTS_DIR, "argos-$(flag)-bieglerkkt-$(dev).txt")
+        writedlm(output_file, [cases results])
     end
 end
