@@ -107,7 +107,7 @@ function ac_power_model(
 
     data = parse_ac_power_data(filename, backend)
 
-    w = ExaModels.ExaCore(T, backend)
+    w = ExaModels.ExaCore(T; backend=backend)
 
     va = ExaModels.variable(w, length(data.bus);)
 
