@@ -1,7 +1,7 @@
 
 JULIAEXEC=julia
 NPROCS=1
-BENCHMARKS= cutest powermodels exaopf argos
+BENCHMARKS= cutest powermodels exaopf argos cops
 
 install:
 	for benchmark in $(BENCHMARKS) ; do \
@@ -21,11 +21,24 @@ test:
 		$(JULIAEXEC) --project=$${benchmark} $${benchmark}/test.jl ; \
 	done
 
-all: 
+cutest:
 	$(JULIAEXEC) --project=cutest -p $(NPROCS) cutest/benchmark.jl --solver all 
+
+lbfgs:
 	$(JULIAEXEC) --project=cutest -p $(NPROCS) cutest/lbfgs/benchmark.jl --solver all 
-	$(JULIAEXEC) --project=powermodels -p $(NPROCS) powermodels/benchmark.jl --solver all 
-	$(JULIAEXEC) --project=exaopf exaopf/benchmark.jl --solver all 
+
+argos:
 	$(JULIAEXEC) --project=argos argos/full/benchmark.jl
 	$(JULIAEXEC) --project=argos argos/reduced/benchmark.jl
+
+cops-cpu:
+	$(JULIAEXEC) --project=cops cops/benchmark.jl --instances default
+
+cops-gpu:
+	$(JULIAEXEC) --project=cops cops/benchmark.jl --instances gpu
+
+mittelmann:
+	$(JULIAEXEC) --project=cops cops/benchmark.jl --instances mittelmann
+
+all: cutest lbfgs exaopf argos cops-cpu mittelmann
 
