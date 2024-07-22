@@ -351,10 +351,10 @@ uuid = "34c5aeac-e683-54a6-a0e9-6e0fdc586c50"
 version = "0.4.3"
 
 [[deps.HSL_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "METIS_jll", "OpenBLAS32_jll", "Pkg", "libblastrampoline_jll"]
-path = "/home/fpacaud/dev/HSL_jll_x86_64-linux-gnu-libgfortran5/"
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "6a7d6bbdbd0029ab369240414a1faff417ad80ef"
 uuid = "017b0a0e-03f4-516a-9b91-836bbd1904dd"
-version = "2023.3.19+0"
+version = "3.0.0+0"
 
 [[deps.Hwloc_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]

@@ -207,23 +207,23 @@ function solve_madnlp_sckkt_cuda(model::Model)
     )
 end
 
-function solve_madnlp_ma57(model::Model)
+function solve_madnlp_ma27(model::Model)
     nlp = ExaModels.ExaModel(model)
     return _benchmark_madnlp(
         nlp;
         disable_garbage_collector=true,
         tol=1e-6,
         dual_initialized = true,
-        linear_solver=Ma57Solver,
+        linear_solver=Ma27Solver,
         print_level=MadNLP.ERROR,
     )
 end
 
-function solve_madnlp_ma57_jump(model::Model)
+function solve_madnlp_ma27_jump(model::Model)
     JuMP.set_optimizer(model, MadNLP.Optimizer)
     JuMP.set_optimizer_attribute(model, "disable_garbage_collector", true)
     JuMP.set_optimizer_attribute(model, "tol", 1e-6)
-    JuMP.set_optimizer_attribute(model, "linear_solver", Ma57Solver)
+    JuMP.set_optimizer_attribute(model, "linear_solver", Ma27Solver)
     JuMP.set_optimizer_attribute(model, "print_level", MadNLP.ERROR)
     mem = @allocated begin
         JuMP.optimize!(model)
@@ -237,23 +237,23 @@ function solve_madnlp_ma57_jump(model::Model)
     return (status, obj, tot_time, mem, iter)
 end
 
-function solve_ipopt_ma57(model::JuMP.Model)
+function solve_ipopt_ma27(model::JuMP.Model)
     nlp = ExaModels.ExaModel(model)
     return _benchmark_ipopt(
         nlp;
         hsllib=HSL_jll.libhsl_path,
-        linear_solver="ma57",
+        linear_solver="ma27",
         max_cpu_time=900.0,
         print_level=5,
         tol=1e-6,
     )
 end
 
-function solve_ipopt_ma57_jump(model::Model)
+function solve_ipopt_ma27_jump(model::Model)
     JuMP.set_optimizer(model, Ipopt.Optimizer)
     JuMP.set_optimizer_attribute(model, "tol", 1e-6)
     JuMP.set_optimizer_attribute(model, "hsllib", HSL_jll.libhsl_path)
-    JuMP.set_optimizer_attribute(model, "linear_solver", "ma57")
+    JuMP.set_optimizer_attribute(model, "linear_solver", "ma27")
     JuMP.set_optimizer_attribute(model, "print_level", 0)
     mem = @allocated begin
         JuMP.optimize!(model)
