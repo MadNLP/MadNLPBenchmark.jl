@@ -17,24 +17,28 @@ function benchmark(evalmodel, probs; warm_up_probs=[])
     status = []
     names = []
     time = Float64[]
+    obj = Float64[]
     mem = Float64[]
     iter = Float64[]
     println("Solving problems")
     for (k, prob) in enumerate(probs)
         name, case = prob
         println("Solving $name")
-        s, t, m, i = evalmodel(case)
+        s, o, t, m, i = evalmodel(case)
         push!(names, name)
         push!(status, s)
+        push!(obj, o)
         push!(time, t)
         push!(mem, m)
         push!(iter, i)
     end
-    results = [names status time mem iter]
-    return results
+    return [names status obj time mem iter]
 end
 
-@main function main(; solver="madnlp-cpu", quick::Bool=false)
+@main function main(;
+    solver="madnlp-cpu",
+    quick::Bool=false,
+)
     if !isdir(RESULTS_DIR)
         mkpath(RESULTS_DIR)
     end
@@ -44,27 +48,32 @@ end
     else
         all_cases = filter(((n,c),)-> endswith(n, "goc") || endswith(n, "pegase"), pglib_cases)
     end
-    ncases = length(all_cases)
 
-    flag = quick ? "short" : "full"
+    flag = quick ? "quick" : "full"
 
     run_madnlp_cpu = (solver == "madnlp-cpu") || (solver == "all")
     run_madnlp_cuda = (solver == "madnlp-cuda") || (solver == "all")
+    run_hykkt_cuda = (solver == "hykkt-cuda") || (solver == "all")
     run_ipopt = (solver == "ipopt") || (solver == "all")
 
     if run_madnlp_cpu
-        results = benchmark(madnlp_eval_cpu, all_cases; warm_up_probs=["pglib_opf_case118_ieee.m"])
-        output_file = joinpath(RESULTS_DIR, "exaopf-madnlp-cpu.csv")
+        results = benchmark(solve_madnlp_ma27, all_cases; warm_up_probs=["pglib_opf_case118_ieee.m"])
+        output_file = joinpath(RESULTS_DIR, "exaopf-$(flag)-madnlp-ma27.csv")
         writedlm(output_file, results)
     end
     if run_madnlp_cuda
-        results = benchmark(madnlp_eval_cuda, all_cases; warm_up_probs=["pglib_opf_case118_ieee.m"])
-        output_file = joinpath(RESULTS_DIR, "exaopf-madnlp-cuda.csv")
+        results = benchmark(solve_madnlp_sckkt_cuda, all_cases; warm_up_probs=["pglib_opf_case118_ieee.m"])
+        output_file = joinpath(RESULTS_DIR, "exaopf-$(flag)-madnlp-cuda.csv")
+        writedlm(output_file, results)
+    end
+    if run_hykkt_cuda
+        results = benchmark(solve_madnlp_hykkt_cuda, all_cases; warm_up_probs=["pglib_opf_case118_ieee.m"])
+        output_file = joinpath(RESULTS_DIR, "exaopf-$(flag)-hykkt-cuda.csv")
         writedlm(output_file, results)
     end
     if run_ipopt
-        results = benchmark(ipopt_eval, all_cases; warm_up_probs=["pglib_opf_case118_ieee.m"])
-        output_file = joinpath(RESULTS_DIR, "exaopf-ipopt.csv")
+        results = benchmark(solve_ipopt_ma27, all_cases; warm_up_probs=["pglib_opf_case118_ieee.m"])
+        output_file = joinpath(RESULTS_DIR, "exaopf-$(flag)-ipopt.csv")
         writedlm(output_file, results)
     end
 end
