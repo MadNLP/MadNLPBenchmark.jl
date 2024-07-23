@@ -45,16 +45,17 @@ function evalmodel(name, solver; gcoff=false)
             end
         end
         gcoff && GC.enable(true);
+        # N.B. *ALWAYS* call explicitly garbage collector
+        #      to avoid annoying memory leak as GC was disable before.
+        GC.gc(true)
+        println("Solved $name")
         finalize(nlp)
         return (status=get_status(retval.status),time=t,mem=mem,iter=retval.iter)
     catch e
         finalize(nlp)
+        GC.gc(true)
         return (status=3, time=0.,mem=0,iter=0)
     end
-    # N.B. *ALWAYS* call explicitly garbage collector
-    #      to avoid annoying memory leak as GC was disable before.
-    GC.gc(true)
-    println("Solved $name")
 end
 
 #=
