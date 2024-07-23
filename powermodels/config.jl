@@ -24,6 +24,9 @@ function evalmodel(prob, solver; gcoff=false)
     gcoff && GC.enable(false);
     retval = solver(pm)
     gcoff && GC.enable(true);
+    # N.B. *ALWAYS* call explicitly garbage collector
+    #      to avoid annoying memory leak as GC was disable before.
+    GC.gc(true)
     return retval
 end
 
@@ -45,7 +48,7 @@ get_name(pm) = "$(pm.data["name"])-$(typeof(pm))"
 function madnlp_solver(pm)
     set_optimizer(
         pm.model, ()-> MadNLP.Optimizer(
-            linear_solver=Ma57Solver,
+            linear_solver=Ma27Solver,
             max_wall_time=900.0,
             tol=1e-6,
             print_level=MadNLP.ERROR,

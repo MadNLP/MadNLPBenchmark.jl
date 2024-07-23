@@ -51,6 +51,9 @@ function evalmodel(name, solver; gcoff=false)
         finalize(nlp)
         return (status=3, time=0.,mem=0,iter=0)
     end
+    # N.B. *ALWAYS* call explicitly garbage collector
+    #      to avoid annoying memory leak as GC was disable before.
+    GC.gc(true)
     println("Solved $name")
 end
 
@@ -69,13 +72,7 @@ function madnlp_solver(nlp)
 end
 
 function get_status(code::MadNLP.Status)
-    if code == MadNLP.SOLVE_SUCCEEDED
-        return 1
-    elseif code == MadNLP.SOLVED_TO_ACCEPTABLE_LEVEL
-        return 2
-    else
-        return 3
-    end
+    return Int(code)
 end
 
 
