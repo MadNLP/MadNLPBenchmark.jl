@@ -30,13 +30,13 @@ EXCLUDE = [
 ]
 
 function decodemodel(name)
-    println("Decoding $name")
-    finalize(CUTEstModel(name))
+    sifdecoder(name)
+    build_libsif(name)
 end
 
 function evalmodel(name, solver; gcoff=false)
     println("Solving $name")
-    nlp = CUTEstModel(name; decode=false)
+    nlp = CUTEstModel{Float64}(name; decode=false)
     try
         gcoff && GC.enable(false);
         mem = @allocated begin
