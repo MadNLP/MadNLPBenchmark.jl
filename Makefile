@@ -27,10 +27,6 @@ cutest:
 lbfgs:
 	$(JULIAEXEC) --project=cutest -p $(NPROCS) cutest/lbfgs/benchmark.jl --solver all 
 
-argos:
-	$(JULIAEXEC) --project=argos argos/full/benchmark.jl
-	$(JULIAEXEC) --project=argos argos/reduced/benchmark.jl
-
 cops-cpu:
 	$(JULIAEXEC) --project=cops cops/benchmark.jl --instances default
 

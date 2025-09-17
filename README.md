@@ -99,21 +99,6 @@ As it is designed to run on the GPU, we cannot run the ExaOPF benchmark
 on more than one process.
 
 
-### Optimal power flow: Argos
-Benchmark MadNLP on the PGLIB benchmark, using Argos.jl
-as a backend. Argos uses the compact formulation of the polar
-AC-OPF, equivalent to the following [JuMP model](url).
-```shell
-julia --project=argos argos/full/benchmark.jl
-
-```
-In addition, Argos implements the reduced-space OPF formulation of Dommel & Tinney.
-```shell
-julia --project=argos argos/reduced/benchmark.jl
-
-```
-
-
 ## Plots
 The directory `plots/` stores various scripts to plot the results of the different benchmark,
 including performance profiles. The performance profiles are plotted
