@@ -1,11 +1,6 @@
 
 using DelimitedFiles
 using CUTEst
-using NLPModelsIpopt
-
-using HSL
-using MadNLP
-using MadNLPHSL
 
 EXCLUDE = [
     # MadNLP running into error
@@ -27,6 +22,8 @@ EXCLUDE = [
     "BA-L52LS",
     "BA-L73LS",
     "BA-L21LS",
+    # Failure
+    "CHARDIS0"
 ]
 
 function decodemodel(name)
@@ -58,49 +55,6 @@ function evalmodel(name, solver; gcoff=false)
     end
 end
 
-#=
-    MadNLP
-=#
-
-function madnlp_solver(nlp)
-    return madnlp(
-        nlp;
-        linear_solver=Ma57Solver,
-        max_wall_time=900.0,
-        print_level=MadNLP.ERROR,
-        tol=1e-6,
-    )
-end
-
-function get_status(code::MadNLP.Status)
-    return Int(code)
-end
-
-
-#=
-    Ipopt
-=#
-
-function get_status(code::Symbol)
-    if code == :first_order
-        return 1
-    elseif code == :acceptable
-        return 2
-    else
-        return 3
-    end
-end
-
-function ipopt_solver(nlp)
-    return ipopt(
-        nlp;
-        hsllib=HSL.HSL_jll.libhsl_path,
-        linear_solver="ma57",
-        max_cpu_time=900.0,
-        print_level=0,
-        tol=1e-6,
-    )
-end
 
 #=
     main
@@ -123,3 +77,7 @@ function benchmark(solver, probs; warm_up_probs=[], decode=false, gc_off=true)
     iter   = [retval.iter for retval in retvals]
     return status, time, mem, iter
 end
+
+
+
+
