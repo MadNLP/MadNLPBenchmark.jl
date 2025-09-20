@@ -2,8 +2,6 @@
     Ipopt
 =#
 
-ipopt_linear_solver = eval(Symbol(ipopt_linear_solver))
-
 using NLPModelsIpopt
 using HSL_jll
 
@@ -21,10 +19,12 @@ function ipopt_solver(nlp)
     return ipopt(
         nlp;
         hsllib=HSL_jll.libhsl_path,
+        ma57_automatic_scaling="yes",
         linear_solver=ipopt_linear_solver,
         max_cpu_time=900.0,
         print_level=0,
         tol=tol,
     )
 end
+
 

@@ -2,7 +2,7 @@
     MadNLP
 =#
 
-using MadNLPHSL
+using MadNLPHSL, MadNLPMumps
 
 madnlp_linear_solver = eval(Symbol(madnlp_linear_solver))
 
@@ -10,6 +10,7 @@ function madnlp_solver(nlp)
     return madnlp(
         nlp;
         linear_solver=madnlp_linear_solver,
+        ma57_automatic_scaling=true,
         max_wall_time=900.0,
         print_level=MadNLP.ERROR,
         tol=tol,

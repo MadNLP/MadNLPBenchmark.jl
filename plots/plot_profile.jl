@@ -32,12 +32,11 @@ function process_results(res, col)
     return values
 end
 
-@main function main(file1, file2; type="iter", name="pprof", format="pdf")
+Comonicon.@main function main(files...; type="iter", name="pprof", format="pdf")
 
-    results_1 = readdlm(file1)
-    results_2 = readdlm(file2)
+    results = [readdlm(file) for file in files]
 
-    if size(results_1, 1) != size(results_2, 1)
+    if !all(size(results[1], 1) == size(result, 1) for result in results)
         println("The files $(file1) and $(file2) have different sizes." *
                 "Invalid benchmark")
         return
@@ -51,21 +50,22 @@ end
         TIME_COLUMN # by default, we use the solution time as the main metric.
     end
 
-    n_problems = size(results_1, 1)
+    n_problems = size(results[1], 1)
 
     # We select only the problems having a solution time above THRESHOLD.
     # Incorporating smaller problems can lead to inconsistent performance
     # profile, as we are not guaranteed to discard side effect in the
     # solver's initialization.
-    large = results_1[:, TIME_COLUMN] .> THRESHOLD
+    # large = results[1][:, TIME_COLUMN] .> THRESHOLD
 
-    all_results = zeros(n_problems, 2)
-    all_results[:, 1] .= process_results(results_1, col)
-    all_results[:, 2] .= process_results(results_2, col)
+    all_results = zeros(n_problems, length(results))
+    for (i,result) in enumerate(results)
+        all_results[:, i] .= process_results(result, col)
+    end
 
-    all_results = all_results[large, :]
+    # all_results = all_results[large, :]
 
-    display(all_results)
+    # display(all_results)
 
     (label, flag) = if col == TIME_COLUMN
         ("total time spent in solver", "time")
@@ -78,7 +78,7 @@ end
     performance_profile(
         PlotsBackend(),
         copy(all_results),
-        [basename(file1), basename(file2)];
+        [basename(file) for file in files];
         title="Benchmark $(label)",
     )
 

@@ -22,11 +22,15 @@ EXCLUDE = [
     "BA-L52LS",
     "BA-L73LS",
     "BA-L21LS",
+    "BA-L52",
+    "NONSCOMPNE",
+    "LOBSTERZ",
     # Failure
     "CHARDIS0"
 ]
 
 function decodemodel(name)
+    println("Decoding $name")
     sifdecoder(name)
     build_libsif(name)
 end
@@ -61,13 +65,13 @@ end
 =#
 
 function benchmark(solver, probs; warm_up_probs=[], decode=false, gc_off=true)
+    println("Decoding problems")
+    decode && broadcast(decodemodel,probs)
+
     println("Warming up (forcing JIT compile)")
     decode && broadcast(decodemodel,warm_up_probs)
     r = [remotecall.(prob->evalmodel(prob,solver;gcoff=gc_off),i,warm_up_probs) for i in procs() if i!= 1]
     fetch.(r)
-
-    println("Decoding problems")
-    decode && broadcast(decodemodel,probs)
 
     println("Solving problems")
     retvals = pmap(prob->evalmodel(prob,solver;gcoff=gc_off),probs)
