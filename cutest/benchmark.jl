@@ -1,7 +1,6 @@
 using Pkg
 using Comonicon
 using Distributed
-using UUIDs
 
 # Load CUTEst library
 @everywhere include("config.jl")
@@ -14,6 +13,7 @@ Comonicon.@main function main(
     solver="madnlp",
     decode="false",
     quick="false",
+    ipopt_rev = "main",
     madnlp_rev = "master",
     madnlp_linear_solver = "Ma57Solver",
     ipopt_linear_solver = "ma57",
@@ -43,18 +43,16 @@ Comonicon.@main function main(
 
     run_madnlp = (solver == "madnlp") || (solver == "all")
     run_ipopt = (solver == "ipopt") || (solver == "all")
-    uuid = string(UUIDs.uuid4())
 
     if run_madnlp
         @info "Benchmark MadNLP"
-        Pkg.add(name="MadNLP", rev = madnlp_rev)
-        Pkg.add(name="MadNLPHSL", rev = madnlp_rev, subdir="lib/MadNLPHSL")
-        Pkg.add(name="MadNLPMumps", rev = madnlp_rev, subdir="lib/MadNLPMumps")
         @everywhere include("config_madnlp.jl")
+
+        @everywhere println(pathof(MadNLP))
         status,time,mem,iter = benchmark(madnlp_solver,probs;warm_up_probs = ["EIGMINA"], decode = decode)
         results = [probs status time mem iter]
 
-        output_file = joinpath(RESULTS_DIR, "cutest-madnlp-$uuid")
+        output_file = joinpath(RESULTS_DIR, "cutest-madnlp-$madnlp_rev-$madnlp_linear_solver")
         writedlm(output_file * ".csv", results)
         write(output_file * ".txt", "MadNLP rev: $madnlp_rev\nLinear solver: $madnlp_linear_solver\nTol: $tol\n")
     end
@@ -64,9 +62,9 @@ Comonicon.@main function main(
         @everywhere include("config_ipopt.jl")
         status,time,mem,iter = benchmark(ipopt_solver,probs;warm_up_probs = ["EIGMINA"], decode = decode)
         results = [probs status time mem iter]
-        output_file = joinpath(RESULTS_DIR, "cutest-ipopt-$uuid")
+        output_file = joinpath(RESULTS_DIR, "cutest-ipopt-$ipopt_rev-$ipopt_linear_solver")
         writedlm(output_file * ".csv", results)
-        write(output_file * ".txt", "MadNLP rev: $madnlp_rev\nLinear solver: $madnlp_linear_solver\nTol: $tol\n")
+        write(output_file * ".txt", "Ipopt rev: $ipopt_rev\nLinear solver: $ipopt_linear_solver\nTol: $tol\n")
     end
 end
 

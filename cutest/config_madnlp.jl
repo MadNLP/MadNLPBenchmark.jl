@@ -2,7 +2,9 @@
     MadNLP
 =#
 
-using MadNLPHSL, MadNLPMumps
+using MadNLP
+using MadNLPHSL
+# using MadNLPMumps
 
 madnlp_linear_solver = eval(Symbol(madnlp_linear_solver))
 
