@@ -1,0 +1,24 @@
+name = "MadNLPBenchmark"
+uuid = "dabdbe9e-1875-4984-9f44-02ea575dbdb4"
+version = "0.1.0"
+
+[deps]
+COPSBenchmark = "3c263af4-7bba-497b-afe4-00c59a0a48a5"
+CUTEst = "1b53aba6-35b6-5f92-a507-53c67d53f819"
+Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+ExaModels = "1037b233-b668-4ce9-9b63-f9f681f55dd2"
+ExaModelsPower = "2fff4b78-0b6c-428d-bac8-85ccea8c4bdf"
+HSL_jll = "017b0a0e-03f4-516a-9b91-836bbd1904dd"
+MadNLP = "2621e9c9-9eb4-46b1-8089-e8c72242dfb6"
+MadNLPHSL = "7fb6135f-58fe-4112-84ca-653cf5be0c77"
+NLPModels = "a4795742-8479-5a88-8948-cc11e1c8c1a6"
+NLPModelsIpopt = "f4238b75-b362-5c4c-b852-0801c9a21d71"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[compat]
+Distributed = "1.11.0"
+MadNLP = "0.8.12"
+MadNLPHSL = "0.6.0"
+NLPModels = "0.21.5"
+NLPModelsIpopt = "0.11.0"
+Random = "1.11.0"
