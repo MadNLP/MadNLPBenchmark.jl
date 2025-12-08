@@ -1,6 +1,6 @@
 name = "MadNLPBenchmark"
 uuid = "dabdbe9e-1875-4984-9f44-02ea575dbdb4"
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 COPSBenchmark = "3c263af4-7bba-497b-afe4-00c59a0a48a5"
@@ -22,3 +22,7 @@ MadNLPHSL = "0.6.0"
 NLPModels = "0.21.5"
 NLPModelsIpopt = "0.11.0"
 Random = "1.11.0"
+julia = "1.11"
+
+[source]
+COPSBenchmark = { url = "https://github.com/MadNLP/COPSBenchmark.jl", rev = "main" }

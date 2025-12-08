@@ -11,6 +11,7 @@ import MadNLPHSL
 # Benchmarks
 import CUTEst
 import ExaModelsPower
+import COPSBenchmark
 
 include("Benchmarks/Benchmarks.jl")
 include("Solvers/Solvers.jl")

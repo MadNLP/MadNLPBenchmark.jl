@@ -8,9 +8,9 @@ begin const
     # Ordering of the different columns in the result file
     INSTANCE_COLUMN = 1
     STATUS_COLUMN = 2
-    TIME_COLUMN = 3
-    MEMORY_COLUMN = 4
-    ITER_COLUMN = 5
+    ITER_COLUMN = 3
+    TIME_COLUMN = 5
+    MEMORY_COLUMN = 6
     # Optimal status
     OPTIMAL_STATUS = 1
     # Threshold
@@ -32,8 +32,14 @@ function process_results(res, col)
     return values
 end
 
-Comonicon.@main function main(files...; type="iter", name="pprof", format="pdf")
+# Comonicon.@main function main(files...; type="iter", name="pprof", format="pdf")
 
+    files = [
+        "results/cutest/cutest-madnlp-master-Ma57Solver.csv",
+        "results/cutest/cutest-madnlp-adaptive-Ma57Solver.csv",
+    ]
+
+    type = "time"
     results = [readdlm(file) for file in files]
 
     if !all(size(results[1], 1) == size(result, 1) for result in results)
@@ -75,14 +81,20 @@ Comonicon.@main function main(files...; type="iter", name="pprof", format="pdf")
         ("total memory used", "memory")
     end
 
+    labels = [
+        "MadNLP-master",
+        "MadNLP-PR-480",
+    ]
+
     performance_profile(
         PlotsBackend(),
         copy(all_results),
-        [basename(file) for file in files];
-        title="Benchmark $(label)",
+        labels,
+        title="Performance profile comparing the wall time on CUTEst (tol=1e-6)",
     )
+    plot!(titlefontsize=10)
 
     # Output file.
-    savefig("$(name).$(format)")
-end
+    # savefig("$(name).$(format)")
+# end
 

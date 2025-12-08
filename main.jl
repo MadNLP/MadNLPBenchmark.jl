@@ -13,8 +13,8 @@ const RESULTS_DIR = joinpath(@__DIR__, "results")
 const BENCHMARK_KEYS = Dict{String, MadNLPBenchmark.AbstractBenchmarkSetting}(
     "cutest-small" => MadNLPBenchmark.CUTEstBenchmark(; max_var=1000),
     "cutest" => MadNLPBenchmark.CUTEstBenchmark(),
-    "cops" => MadNLPBenchmark.COPSBenchmark(),
-    "mittelmann" => MadNLPBenchmark.COPSBenchmark(; config=:mittelmann),
+    "cops" => MadNLPBenchmark.COPS(),
+    "mittelmann" => MadNLPBenchmark.COPS(; config=:mittelmann),
     "acopf" => MadNLPBenchmark.ACOPFBenchmark(),
     "acopf-polar" => MadNLPBenchmark.ACOPFBenchmark(;formulation=:polar),
     "acopf-rect" => MadNLPBenchmark.ACOPFBenchmark(;formulation=:rect),
