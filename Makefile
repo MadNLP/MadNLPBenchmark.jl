@@ -1,59 +1,39 @@
 SOLVER=madnlp
 JULIAEXEC=julia
-NPROCS=1
+NPROCS=10
 BENCHMARKS= cutest powermodels exaopf cops
 
-CUTEST_TOL=1e-6
-CUTEST_MADNLP_LINEAR_SOLVER=Ma57Solver
-CUTEST_IPOPT_LINEAR_SOLVER=ma57
-CUTEST_MADNLP_REV=master
-CUTEST_IPOPT_REV=main
-CUTEST_QUICK=false
-CUTEST_DECODE=false
+MADNLP_REV=master
+IPOPT_REV=main
 
-LBFGS_TOL=1e-6
-LBFGS_MADNLP_LINEAR_SOLVER=Ma57Solver
-LBFGS_IPOPT_LINEAR_SOLVER=ma57
-LBFGS_MADNLP_REV=master
-LBFGS_QUICK=false
-LBFGS_DECODE=false
-
- .PHONY: install update test cutest lbfgs cops-cpu cops-gpu mittelmann all
+.PHONY: install update latest cutest cops mittelmann all
 
 install:
-	for benchmark in $(BENCHMARKS) ; do \
-		echo Install $${benchmark} ; \
-		$(JULIAEXEC) --project=$${benchmark} -e "using Pkg; Pkg.instantiate()" ; \
-	done
+	$(JULIAEXEC) --project=. -e "using Pkg; Pkg.instantiate()" 
 
 update:
-	for benchmark in $(BENCHMARKS) ; do \
-		echo Update benchmark $${benchmark} ; \
-		$(JULIAEXEC) --project=$${benchmark} -e "using Pkg; Pkg.update()" ; \
-	done
+	$(JULIAEXEC) --project=. -e "using Pkg; Pkg.update()" 
 
-test: 
-	for benchmark in $(BENCHMARKS) ; do \
-		echo $${benchmark} ; \
-		$(JULIAEXEC) --project=$${benchmark} $${benchmark}/test.jl ; \
-	done
+latest: 
+	$(JULIAEXEC) --project=. -e 'import Pkg; Pkg.add(name="MadNLP", rev="$(MADNLP_REV)"); Pkg.add(name="MadNLPHSL", rev="$(MADNLP_REV)"); Pkg.add(name="Ipopt_jll", rev="$(IPOPT_REV)")'
 
 cutest:
-	$(JULIAEXEC) --project=cutest -e 'import Pkg; Pkg.add(name="MadNLP", rev="$(CUTEST_MADNLP_REV)"); Pkg.add(name="MadNLPHSL", rev="$(CUTEST_MADNLP_REV)"); Pkg.add(name="Ipopt_jll", rev="$(CUTEST_IPOPT_REV)")'
-	$(JULIAEXEC) --project=cutest -p $(NPROCS) cutest/benchmark.jl --solver $(SOLVER) --tol $(CUTEST_TOL) --madnlp-linear-solver $(CUTEST_MADNLP_LINEAR_SOLVER) --ipopt-linear-solver $(CUTEST_IPOPT_LINEAR_SOLVER) --madnlp-rev $(CUTEST_MADNLP_REV) --ipopt-rev $(CUTEST_IPOPT_REV) --quick $(CUTEST_QUICK) --decode $(CUTEST_DECODE)
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=ipopt --tol=1e-6 --automatic-scaling --benchmark=cutest
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=madnlp --tol=1e-6 --automatic-scaling --benchmark=cutest
 
-lbfgs:
-	$(JULIAEXEC) --project=cutest -e 'import Pkg; Pkg.add(name="MadNLP", rev="$(LBFGS_MADNLP_REV)"); Pkg.add(name="MadNLPHSL", rev="$(LBFGS_MADNLP_REV)"); Pkg.add(name="Ipopt_jll", rev="$(LBFGS_IPOPT_REV)")'
-	$(JULIAEXEC) --project=lbfgs -p $(NPROCS) lbfgs/lbfgs/benchmark.jl --solver $(SOLVER) --tol $(LBFGS_TOL) --madnlp-linear-solver $(LBFGS_MADNLP_LINEAR_SOLVER) --ipopt-linear-solver $(LBFGS_IPOPT_LINEAR_SOLVER) --madnlp-rev $(LBFGS_MADNLP_REV) --ipopt-rev $(LBFGS_IPOPT_REV) --quick $(LBFGS_QUICK) --decode $(CUTEST_DECODE)
+acopf:
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=ipopt-ma27 --benchmark=acopf
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=madnlp-ma27 --benchmark=acopf
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=ipopt-ma27 --benchmark=acopf-rect
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=madnlp-ma27 --benchmark=acopf-rect
 
-cops-cpu:
-	$(JULIAEXEC) --project=cops cops/benchmark.jl --instances default
-
-cops-gpu:
-	$(JULIAEXEC) --project=cops cops/benchmark.jl --instances gpu
+cops:
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=ipopt --benchmark=cops
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=madnlp --benchmark=cops
 
 mittelmann:
-	$(JULIAEXEC) --project=cops cops/benchmark.jl --instances mittelmann
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=ipopt --benchmark=mittelmann
+	$(JULIAEXEC) -p $(NPROCS) --project=. main.jl --solver=madnlp --benchmark=mittelmann
 
-all: cutest lbfgs exaopf argos cops-cpu mittelmann
+all: cutest cops mittelmann acopf
 
