@@ -32,7 +32,9 @@ function evaluate_model(
 end
 
 function run_benchmark(benchmark::AbstractBenchmarkSetting, solver::AbstractSolverSetup; options...)
-    instances = get_instances(benchmark)
+    return run_benchmark(benchmark, get_instances(benchmark), solver; options...)
+end
+function run_benchmark(benchmark::AbstractBenchmarkSetting, instances::Vector, solver::AbstractSolverSetup; options...)
     m, n = length(instances), 8
     results = zeros(m, n)
     for (k, instance) in enumerate(instances)

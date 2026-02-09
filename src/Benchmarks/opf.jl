@@ -2,6 +2,7 @@
 
 @kwdef struct ACOPFBenchmark <: AbstractBenchmarkSetting
     formulation::Symbol = :polar
+    backend::Any = nothing
 end
 
 get_tag(::ACOPFBenchmark) = "examodelpower"
@@ -71,6 +72,6 @@ function parse_name(instance, ::ACOPFBenchmark)
 end
 
 function load_model(instance::String, benchmark::ACOPFBenchmark)
-    return ExaModelsPower.opf_model(instance; form=benchmark.formulation)[1]
+    return ExaModelsPower.acopf_model(instance; form=benchmark.formulation, backend=benchmark.backend)[1]
 end
 

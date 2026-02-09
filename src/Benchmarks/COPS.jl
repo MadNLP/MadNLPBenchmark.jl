@@ -1,6 +1,7 @@
 
 @kwdef struct COPS <: AbstractBenchmarkSetting
     config::Symbol = :cops
+    backend::Any = nothing
 end
 
 get_tag(bench::COPS) = string(bench.config)
@@ -54,6 +55,6 @@ end
 
 function load_model(instance, benchmark::COPS)
     func = instance[1]
-    return func(instance[2]..., COPSBenchmark.ExaModelsBackend())
+    return func(instance[2]..., COPSBenchmark.ExaModelsBackend(); backend=benchmark.backend)
 end
 
